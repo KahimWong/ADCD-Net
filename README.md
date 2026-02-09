@@ -49,6 +49,9 @@ Use `seg_char.py`. PaddleOCR setup: [PaddleOCR](https://www.paddlepaddle.org.cn/
 
 ## Train ADCD-Net
 
+ADCD-Net is trained on 4 NVIDIA GeForce RTX 4090 24G GPUs which takes about 27 hours with 100k training steps and 40 batch size.
+
+
 1. Set dataset, OCR mask, and checkpoint paths in `cfg.py`.
 2. Run `main.py`.
 
