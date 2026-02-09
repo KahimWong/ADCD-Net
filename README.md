@@ -41,7 +41,7 @@ DocTamperOCR/ # OCR mask directory
 ### Download Doc Protocol Data
 
 4 cross-domain test sets (T-SROIE, OSTF, TPIC-13, RTM):
-https://drive.google.com/drive/folders/1xn8mELN8etQwRo_PgS5XV6XTKCZasz_A?usp=drive_link
+https://drive.google.com/drive/folders/1xn8mELN8etQwRo_PgS5XV6XTKCZasz_A?usp=drive_link (cutted_datasets_fakes.zip)
 
 ## Get OCR masks
 
