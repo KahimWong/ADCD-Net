@@ -1,42 +1,32 @@
-
 # [ICCV'25] ADCD-Net: Robust Document Image Forgery Localization via Adaptive DCT Feature and Hierarchical Content Disentanglement
 
 [![arXiv](https://img.shields.io/badge/arXiv-2507.16397-b31b1b.svg)](https://arxiv.org/abs/2507.16397)
 
-## Description   
+## Description
 
-The official source code of the paper "ADCD-Net: Robust Document Image Forgery Localization via Adaptive DCT Feature and Hierarchical Content Disentanglement". 
+Official code for "ADCD-Net: Robust Document Image Forgery Localization via Adaptive DCT Feature and Hierarchical Content Disentanglement".
 
 ![model_overview](./fig/model_overview.png)
 
-We present a robust document forgery localization model that adaptively leverages RGB/DCT forensic traces and incorporates key document image traits. To counter DCT traces' sensitivity to block misalignment, we modulate DCT feature contributions via predicted alignment scores, enhancing resilience to distortions like resizing and cropping. A hierarchical content disentanglement method boosts localization by reducing text-background disparities. Leveraging pristine background regions, we build a untampered prototype to improve accuracy and robustness.
-
-## TODO
-- [x] 2026.1.1 Correct our Doc Protocol evaluation settings and results.
-- [x] Update DDP training script and make training more stable 
-- [x] Retrain model with fixed `NonAlignCrop`
-- [x] General inference pipline for images outside DocTamper
-- [x] Update better OCR model
-- [x] Evaluate ADCD-Net on [ForensicHub](https://github.com/scu-zjz/ForensicHub) benchmark (Doc Protocol)
-- [x] Release model checkpoint and OCR marks of DocTamper 
-- [x] Release training and inference code
-
 ## ForensicHub Benchmark (Doc Protocol)
 
-![doc_protocol](./fig/doc_protocol.png)
+![doc_protocol](./fig/docpro.png)
 
-Models are trained on Doctamper train set and evaluated on seven test sets. The samples in FCD, SCD and Test set are compressed once, using the final quality factor specified in the official DocTamper pickle file. The authentic images are skipped in all test set since there are no true positives. Please refer to [ForensicHub](https://github.com/scu-zjz/ForensicHub) for more details.
-
-**ADCD-Net is trained on 4 NVIDIA GeForce RTX 4090 24G GPUs which takes about 27 hours with 100k training steps and 40 batch size.**
+Cross-domain evaluation follows the Doc Protocol. See [ForensicHub](https://github.com/scu-zjz/ForensicHub/issues/26).
 
 ## Environment Setup
 
-Install dependencies: python 3.10.13, pytorch 2.3.0+cu121, albumentations 2.0.8
+Dependencies: python 3.10.13, pytorch 2.3.0+cu121, albumentations 2.0.8.
 
-## Prepare DocTamper Data
+## Data Preparation
 
-Download the DocTamper dataset from [DocTamper](https://github.com/qcf-568/DocTamper) (```qt_table.pk``` and files in ```pks``` can be found from the DocTamper repository) and the ocr mask and model checkpoints from [ADCD-Net](https://drive.google.com/file/d/1-5BU3Bavs6SGJpaByua_FhDuUJGoo-iS/view?usp=sharing).
-The files from ADCD-Net is organized as follows:
+### Download DocTamper Data
+
+DocTamper dataset (Training, Testing, FCD, SCD): [DocTamper](https://github.com/qcf-568/DocTamper). `qt_table.pk` and `pks` are in the DocTamper repo.
+
+### Download ADCD-Net Data
+
+OCR masks and checkpoints: [ADCD-Net](https://drive.google.com/file/d/1-5BU3Bavs6SGJpaByua_FhDuUJGoo-iS/view?usp=sharing).
 
 ```
 ADCDNet.pth # ADCD-Net checkpoint
@@ -48,48 +38,39 @@ DocTamperOCR/ # OCR mask directory
     └── SCD # SCD dataset directory
 ```
 
-## Prepare Doc Protocol Data
+### Download Doc Protocol Data
 
-Beside DocTamper, we provide the 4 cross-domain test set data and the corresponding ocr masks and path pickle files [here](https://drive.google.com/file/d/18SFU1BHoBTcvhNnDLoDRqGdpDfzLvnJp/view?usp=sharing), you should modify your correct directory in the path.
+4 cross-domain test sets (T-SROIE, OSTF, TPIC-13, RTM):
+https://drive.google.com/drive/folders/1xn8mELN8etQwRo_PgS5XV6XTKCZasz_A?usp=drive_link
 
 ## Get OCR masks
 
-Please refer to ```seg_char.py```. For the environment of PaddleOCR, please check [PaddleOCR](https://www.paddlepaddle.org.cn/en/install/quick?docurl=/documentation/docs/en/develop/install/pip/linux-pip_en.html).
+Use `seg_char.py`. PaddleOCR setup: [PaddleOCR](https://www.paddlepaddle.org.cn/en/install/quick?docurl=/documentation/docs/en/develop/install/pip/linux-pip_en.html).
 
-## Train with DocTamper
+## Train ADCD-Net
 
-1. set the paths of the dataset, ocr mask and model checkpoint in ```cfg.py```
-2. run the ```main.py```
+1. Set dataset, OCR mask, and checkpoint paths in `cfg.py`.
+2. Run `main.py`.
 
 ```python
 mode = 'train'
-root = 'path/to/root' # TODO:
-docres_ckpt_path = 'path/to/docres.pkl' # TODO:
+root = 'path/to/root'
+docres_ckpt_path = 'path/to/docres.pkl'
 ```
 
-## Evaluate with DocTamper
+## Reproduce ForensicHub (Doc Protocol) Results of ADCD-Net
 
-1. set the paths of the dataset, distortions, ocr mask and model checkpoint in ```cfg.py```. 
-2. run the ```main.py```
+Doc Protocol: train on DocTamper training set, evaluate on seven test sets. DocTamper FCD/SCD/Test set are compressed once using the official DocTamper pickle QFs. Authentic images are skipped.
+
+1. Generate OCR masks for T-SROIE/OSTF/TPIC-13/RTM with `seg_char.py`.
+3. Generate path pkl files for T-SROIE/OSTF/TPIC-13/RTM with `build_path_pkl.py`.
+4. Update the following in `cfg.py` and run `main.py`.
 
 ```python
 mode = 'val'
-root = 'path/to/root' # TODO:
-ckpt = 'path/to/ADCDNet.pth' # TODO:
-docres_ckpt_path = 'path/to/docres.pkl' # TODO:
-
-multi_jpeg_val = False  # able to use multi jpeg distortion
-jpeg_record = False  # manually set multi jpeg distortion record
-min_qf = 75  # minimum jpeg quality factor
-shift_1p = False  # shift 1 pixel for evaluation
-val_aug = None # other distortions can be added here
+all_ds_name = ['TestingSet', 'FCD', 'SCD', 'T-SROIE_test', 'Tampered-IC13_test', 'RealTextManipulation_test', 'OSTF_test']
+pkl_dir = 'path/to/path_pkl'
 ```
-
-## General Evaluation
-1. Generate OCR masks with `seg_char.py`.
-2. Build a pickle file containing list of tuples `(img_path, mask_path, ocr_mask_path)`.
-3. In `cfg.py`, set `mode='general_val'`, and specify the paths to the pickle file and the model checkpoint.
-4. Details can be found in the `GeneralValDs` class in `ds.py` for general dataset construction.
 
 ## Citation
 

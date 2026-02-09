@@ -4,7 +4,8 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import cv2
 import numpy as np
 from paddleocr import TextDetection
-
+from glob import glob
+from tqdm import tqdm
 
 class TextDetector:
     def __init__(self):
@@ -35,4 +36,19 @@ class TextDetector:
 if __name__ == '__main__':
     detector = TextDetector()
 
-    detector.get_mask(img_path='', save_path='')
+    root = 'path/to/cutted_datasets_fakes'
+
+    ds_name_list = ['Tampered-IC13_test', 'OSTF_test', 'T-SROIE_test', 'RealTextManipulation_test']
+
+    for ds_name in  ds_name_list:
+        print(f'Processing dataset: {ds_name}')
+        ds_dir = os.path.join(root, ds_name)
+        ocr_dir = os.path.join(ds_dir, 'ocr')
+        img_dir = os.path.join(ds_dir, 'images')
+        os.makedirs(ocr_dir, exist_ok=True)
+        img_list = glob(os.path.join(img_dir, '*'))
+        for img_path in tqdm(img_list):
+            img = cv2.imread(img_path)
+            img_name = os.path.basename(img_path)
+            ocr_path = os.path.join(ocr_dir, img_name)
+            detector.get_mask(img_path=img_path, save_path=ocr_path)

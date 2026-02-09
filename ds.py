@@ -1,26 +1,25 @@
-import os.path as op
-import pickle
-import tempfile
-from copy import deepcopy
-from random import randint
-from random import random
-
 import albumentations as A
 import albumentations.augmentations.crops.functional as F
 import cv2
 import lmdb
 import numpy as np
+import os.path as op
+import pickle
 import six
+import tempfile
 import torch
 import torchvision.transforms as T
 from PIL import Image
 from albumentations import CropNonEmptyMaskIfExists
 from albumentations.pytorch import ToTensorV2
+from copy import deepcopy
 from jpeg2dct.numpy import load
+from random import randint
+from random import random
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 
 import cfg
-
+from get_qt import get_luma_qt_8x8
 
 def load_qt(qt_path):
     with open(qt_path, 'rb') as fpk:
@@ -348,7 +347,7 @@ class DtdValDs(Dataset):
                                    upper_bound=-1,
                                    jpeg_record=record)
 
-        qt = self.qts[qfs[-1]]
+        qt = self.qts[100]  # self.qts[qfs[-1]]
         img = self.img_totsr(img)
         ori_img = np.array(img)
         mask = self.mask_totsr(image=mask.copy())['image']
@@ -393,6 +392,7 @@ class GeneralValDs(Dataset):
     def __getitem__(self, index):
         img_path, mask_path, ocr_path = self.path_list[index]
 
+
         img_name = op.basename(img_path).split('.')[0]
         img = cv2.imread(img_path)
         h, w = img.shape[:2]
@@ -415,7 +415,6 @@ class GeneralValDs(Dataset):
                                    min_qf=-1,
                                    upper_bound=-1,
                                    jpeg_record=[100])
-
         qt = self.qts[qfs[-1]]
         img = self.img_totsr(img)
         ori_img = np.array(img)
@@ -425,7 +424,7 @@ class GeneralValDs(Dataset):
         return {
             'img': img,
             'dct': np.clip(np.abs(dct), 0, 20),
-            'qt': qt,
+            'qt': qt.clamp(0, 63),
             'mask': mask.long(),
             'ocr_mask': ocr_mask.long(),
             'img_name': img_name,
@@ -549,10 +548,10 @@ def get_val_dl(world_size, rank, dp=False):
 
         if val_name in ['FCD', 'SCD', 'TestingSet']:
             ds = DtdValDs(val_name, is_sample)
-            b = 4
+            b = cfg.val_bs
         else:
             ds = GeneralValDs(val_name, is_sample)
-            b = 1
+            b = cfg.val_bs
 
         sampler = DistributedSampler(dataset=ds, num_replicas=world_size, rank=rank, shuffle=False) if not dp else None
         dl = DataLoader(dataset=ds, batch_size=b, num_workers=cfg.dl_workers, sampler=sampler,
