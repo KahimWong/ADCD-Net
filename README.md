@@ -12,7 +12,7 @@ Official code for "ADCD-Net: Robust Document Image Forgery Localization via Adap
 
 ![doc_protocol](./fig/docpro.png)
 
-Cross-domain evaluation follows the Doc Protocol. See [ForensicHub](https://github.com/scu-zjz/ForensicHub/issues/26).
+The evaluation follows the Doc Protocol. See [ForensicHub](https://github.com/scu-zjz/ForensicHub/issues/26).
 
 ## Environment Setup
 

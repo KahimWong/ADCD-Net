@@ -186,6 +186,7 @@ class Trainer:
                 if self.rank == 0:
                     logging.info('Val Set: %s' % val_name)
 
+                sum_f1 = torch.zeros(1, device=f'cuda:{self.rank}')
                 sum_p = torch.zeros(1, device=f'cuda:{self.rank}')
                 sum_r = torch.zeros(1, device=f'cuda:{self.rank}')
                 num_images = torch.zeros(1, device=f'cuda:{self.rank}')
@@ -210,18 +211,22 @@ class Trainer:
                             crop_logit = logit[..., :h, :w].unsqueeze(0)
                             crop_y = each_y[..., :h, :w].unsqueeze(0)
                             per_f1, per_p, per_r = self.compute_f1(crop_logit, crop_y)
+                            sum_f1 += per_f1
                             sum_p += per_p
                             sum_r += per_r
                             num_images += 1.
 
                 dist.reduce(sum_p, dst=0, op=dist.ReduceOp.SUM)
                 dist.reduce(sum_r, dst=0, op=dist.ReduceOp.SUM)
+                dist.reduce(sum_f1, dst=0, op=dist.ReduceOp.SUM)
                 dist.reduce(num_images, dst=0, op=dist.ReduceOp.SUM)
                 if self.rank == 0:
-                    p = sum_p.item() / num_images.item()
-                    r = sum_r.item() / num_images.item()
-                    f1 = 2 * p * r / (p + r + self.eps)
-                    logging.info('P:%.4f R:%.4f F1:%.4f' % (p, r, f1))
+                    # p = sum_p.item() / num_images.item()
+                    # r = sum_r.item() / num_images.item()
+                    # f1 = 2 * p * r / (p + r + self.eps)
+                    # logging.info('P:%.4f R:%.4f F1:%.4f' % (p, r, f1))
+                    f1 = sum_f1.item() / num_images.item()
+                    logging.info('AVG F1: %.4f' % f1)
                     ds_f1_list.append(f1)
 
             if self.rank == 0:
