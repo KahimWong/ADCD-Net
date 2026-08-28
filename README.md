@@ -60,7 +60,7 @@ DocTamperOCR/        # Pre-generated OCR mask directory
 ### 3. Download Doc Protocol Cross-Domain Test Sets
 
 Download the 4 cross-domain test sets (T-SROIE, OSTF, TPIC-13, RTM) from:
-👉 [Doc Protocol Data (Google Drive)](https://drive.google.com/drive/folders/1xn8mELN8etQwRo_PgS5XV6XTKCZasz_A?usp=drive_link) — `cutted_datasets_fakes.zip`
+👉 [Doc Protocol Data]([https://drive.google.com/drive/folders/1xn8mELN8etQwRo_PgS5XV6XTKCZasz_A?usp=drive_link](https://huggingface.co/datasets/Jason37437/Doc-Protocol-Data)) — `cutted_datasets_fakes.zip`
 
 ---
 
