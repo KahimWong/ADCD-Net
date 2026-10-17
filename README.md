@@ -3,7 +3,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2507.16397-b31b1b.svg)](https://arxiv.org/abs/2507.16397)
 [![Venue](https://img.shields.io/badge/Venue-ICCV-blue)](https://openaccess.thecvf.com/content/ICCV2025/html/Wong_ADCD-Net_Robust_Document_Image_Forgery_Localization_via_Adaptive_DCT_Feature_ICCV_2025_paper.html)
-[![License](https://img.shields.io/github/license/KahimWong/ADCD-Net)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **ADCD-Net** addresses the challenging problem of document image forgery localization by leveraging adaptive DCT features alongside hierarchical content disentanglement to robustly detect tampered regions even under compression distortions.
 
